@@ -5,6 +5,7 @@
 # check_telegram_id
 # ----------------------------------------------------------------------------------------------------------------------
 # ---------------------------------- Импорт стандартных библиотек Пайтона
+import datetime
 # ---------------------------------- Импорт сторонних библиотек
 from sqlalchemy import text
 # from sqlalchemy.ext.asyncio.engine import AsyncEngine
@@ -58,24 +59,43 @@ async def get_user_data(tg_id, session: AsyncSession):
         print(f'Ошибка в результате запроса в функции "get_user_data": {error_text}')
         return None
 
+async def save_bot_stat(user_id, metric, answer_type, session: AsyncSession):
+    """
+    save_stat
+    """
 
-# ----------------------------- KPD --------------------------------
-async def get_kpd_user(user_guid, session: AsyncSession):
-    """
-        Функция для извлечения данных о КПД пользователя. На вход поступает сессия (готовое подключение к бд, Джарвис)\
-        и гуид.
-        sql = get_kpd_user
-        Вернет:
-    """
+    # Текущая дата
+    dt = datetime.datetime.now()
 
     try:
-        formatted_query = kpd_user.format(user_guid)  #
-        result_tmp = await session.execute(text(formatted_query)) # Извлекаем данные:
-        results = result_tmp.fetchone()  # Возвращает одну строку или None
-        return results
+        formatted_query = save_stat.format(dt, user_id, metric, answer_type)
+        await session.execute(text(formatted_query))
+        await session.commit()
     except Exception as error_text:
-        print(f'Ошибка в результате запроса в функции "get_kpd_user": {error_text}')
+        print(f'Ошибка в результате запроса в функции "save_bot_stat": {error_text}')
         return None
+
+
+
+
+
+# ----------------------------- KPD --------------------------------
+# async def get_kpd_user(user_guid, session: AsyncSession):
+#     """
+#         Функция для извлечения данных о КПД пользователя. На вход поступает сессия (готовое подключение к бд, Джарвис)\
+#         и гуид.
+#         sql = get_kpd_user
+#         Вернет:
+#     """
+#
+#     try:
+#         formatted_query = kpd_user.format(user_guid)  #
+#         result_tmp = await session.execute(text(formatted_query)) # Извлекаем данные:
+#         results = result_tmp.fetchone()  # Возвращает одну строку или None
+#         return results
+#     except Exception as error_text:
+#         print(f'Ошибка в результате запроса в функции "get_kpd_user": {error_text}')
+#         return None
 
 
 # async def get_kpd_rating(user_guid, session: AsyncSession):
@@ -96,59 +116,59 @@ async def get_kpd_user(user_guid, session: AsyncSession):
 #         return None
 
 
-async def get_kpd_rating_user(user_guid, session: AsyncSession):
-    """
-        Функция для извлечения рейтинга КПД пользователя в текущем месяце. На вход поступает сессия \
-        (готовое подключение к бд, Джарвис) и гуид.
-        sql = get_kpd_rating_user
-        Вернет:
-    """
-
-    try:
-        formatted_query = kpd_rating_user.format(user_guid)  #
-        result_tmp = await session.execute(text(formatted_query)) # Извлекаем данные:
-        results = result_tmp.fetchone()  # Возвращает одну строку или None (картеж) (1, 'Alice')
-        return results
-    except Exception as error_text:
-        print(f'Ошибка в результате запроса в функции "get_kpd_rating_user": {error_text}')
-        return None
-
-
-async def get_top5_kpd_rating_users(user_guid, session: AsyncSession):
-    """
-        Функция для извлечения Топ 5 пользователей по рейтингу в текущем месяце. На вход поступает сессия \
-        (готовое подключение к бд, Джарвис) и гуид.
-        sql = get_top5_kpd_rating_users
-        Вернет: массив: UserName, kpd, rating_kpd
-    """
-
-    try:
-        formatted_query = top5_kpd_rating_users.format(user_guid)  #
-        result_tmp = await session.execute(text(formatted_query)) # Извлекаем данные:
-        results = result_tmp.fetchall()  # Возвращает список кортежей: [(1, 'Alice'), (2, 'Bob')]
-        return results
-    except Exception as error_text:
-        print(f'Ошибка в результате запроса в функции "get_top5_kpd_rating_users": {error_text}')
-        return None
-
-
-
-async def get_top5end_kpd_rating_users(user_guid, session: AsyncSession):
-    """
-        Функция для извлечения Топ 5 пользователей по рейтингу в текущем месяце. На вход поступает сессия \
-        (готовое подключение к бд, Джарвис) и гуид.
-        sql = get_top5_kpd_rating_users
-        Вернет: массив: UserName, kpd, rating_kpd
-    """
-
-    try:
-        formatted_query = top5end_kpd_rating_users.format(user_guid)  #
-        result_tmp = await session.execute(text(formatted_query)) # Извлекаем данные:
-        results = result_tmp.fetchall()  # Возвращает список кортежей: [(1, 'Alice'), (2, 'Bob')]
-        return results
-    except Exception as error_text:
-        print(f'Ошибка в результате запроса в функции "get_top5end_kpd_rating_users": {error_text}')
-        return None
+# async def get_kpd_rating_user(user_guid, session: AsyncSession):
+#     """
+#         Функция для извлечения рейтинга КПД пользователя в текущем месяце. На вход поступает сессия \
+#         (готовое подключение к бд, Джарвис) и гуид.
+#         sql = get_kpd_rating_user
+#         Вернет:
+#     """
+#
+#     try:
+#         formatted_query = kpd_rating_user.format(user_guid)  #
+#         result_tmp = await session.execute(text(formatted_query)) # Извлекаем данные:
+#         results = result_tmp.fetchone()  # Возвращает одну строку или None (картеж) (1, 'Alice')
+#         return results
+#     except Exception as error_text:
+#         print(f'Ошибка в результате запроса в функции "get_kpd_rating_user": {error_text}')
+#         return None
+#
+#
+# async def get_top5_kpd_rating_users(user_guid, session: AsyncSession):
+#     """
+#         Функция для извлечения Топ 5 пользователей по рейтингу в текущем месяце. На вход поступает сессия \
+#         (готовое подключение к бд, Джарвис) и гуид.
+#         sql = get_top5_kpd_rating_users
+#         Вернет: массив: UserName, kpd, rating_kpd
+#     """
+#
+#     try:
+#         formatted_query = top5_kpd_rating_users.format(user_guid)  #
+#         result_tmp = await session.execute(text(formatted_query)) # Извлекаем данные:
+#         results = result_tmp.fetchall()  # Возвращает список кортежей: [(1, 'Alice'), (2, 'Bob')]
+#         return results
+#     except Exception as error_text:
+#         print(f'Ошибка в результате запроса в функции "get_top5_kpd_rating_users": {error_text}')
+#         return None
+#
+#
+#
+# async def get_top5end_kpd_rating_users(user_guid, session: AsyncSession):
+#     """
+#         Функция для извлечения Топ 5 пользователей по рейтингу в текущем месяце. На вход поступает сессия \
+#         (готовое подключение к бд, Джарвис) и гуид.
+#         sql = get_top5_kpd_rating_users
+#         Вернет: массив: UserName, kpd, rating_kpd
+#     """
+#
+#     try:
+#         formatted_query = top5end_kpd_rating_users.format(user_guid)  #
+#         result_tmp = await session.execute(text(formatted_query)) # Извлекаем данные:
+#         results = result_tmp.fetchall()  # Возвращает список кортежей: [(1, 'Alice'), (2, 'Bob')]
+#         return results
+#     except Exception as error_text:
+#         print(f'Ошибка в результате запроса в функции "get_top5end_kpd_rating_users": {error_text}')
+#         return None
 
 
 
@@ -183,30 +203,30 @@ async def get_top5end_kpd_rating_users(user_guid, session: AsyncSession):
 
 
 # ---------------------------------------- Итог, сборка общих показателей рейтинга КПД:
-async def get_kpd_msg(user_guid, session: AsyncSession):
-    """
-        Функция для формирования данных о рейтинге КПД и др. данных. На вход поступает гуид.
-        Основная информация извлекается вложенными функциями.
+# async def get_kpd_msg(user_guid, session: AsyncSession):
+#     """
+#         Функция для формирования данных о рейтинге КПД и др. данных. На вход поступает гуид.
+#         Основная информация извлекается вложенными функциями.
+#
+#         Вернет: текст с показателями.
+#     """
+#     # try:
+#
+#     # 0. КПД пользователя:
+#     kpd = await get_kpd_user(user_guid, session)
+#     print(f'get_kpd_user: {kpd}')
 
-        Вернет: текст с показателями.
-    """
-    # try:
+    # # 1. Рейтинг конкретного пользователя в текущем месяце (картеж или None):
+    # kpd_rating_user = await get_kpd_rating_user(user_guid, session)
+    # print(f'kpd_rating_user: {kpd_rating_user}')
 
-    # 0. КПД пользователя:
-    kpd = await get_kpd_user(user_guid, session)
-    print(f'get_kpd_user: {kpd}')
-
-    # 1. Рейтинг конкретного пользователя в текущем месяце (картеж или None):
-    kpd_rating_user = await get_kpd_rating_user(user_guid, session)
-    print(f'kpd_rating_user: {kpd_rating_user}')
-
-    # 2. Топ 5 пользователей по рейтингу в текущем месяце (картеж или None):
-    top5_kpd_rating_users = await get_top5_kpd_rating_users(user_guid, session)
-    print(f'top5_kpd_rating_users: {top5_kpd_rating_users}')
-
-    # 3. Топ 5 пользователей худших по рейтингу (5 нижних позиций) в текущем месяце (картеж или None):
-    top5end_kpd_rating_users = await get_top5end_kpd_rating_users(user_guid, session)
-    print(f'top5end_kpd_rating_users: {top5end_kpd_rating_users}')
+    # # 2. Топ 5 пользователей по рейтингу в текущем месяце (картеж или None):
+    # top5_kpd_rating_users = await get_top5_kpd_rating_users(user_guid, session)
+    # print(f'top5_kpd_rating_users: {top5_kpd_rating_users}')
+    #
+    # # 3. Топ 5 пользователей худших по рейтингу (5 нижних позиций) в текущем месяце (картеж или None):
+    # top5end_kpd_rating_users = await get_top5end_kpd_rating_users(user_guid, session)
+    # print(f'top5end_kpd_rating_users: {top5end_kpd_rating_users}')
 
 
     # rating_kpd = await get_kpd_rating(user_guid)

@@ -2,6 +2,13 @@
 Здесь содержатся все запросы sql
 """
 
+
+save_stat = """
+INSERT INTO division.metric_bot_stat (dt, user_id, metric, answer_type) VALUES ('{0}', '{1}', '{2}', '{3}')
+"""
+
+
+
 #  Тип данных столбца tg в базе данных — это строка, не пердавать в запросе значение в виде целого числа !
 tg_id_jar = """SELECT code as user_id FROM inlet.staff_for_bot WHERE tg = '{0}'"""
 
@@ -28,12 +35,12 @@ FROM
             ReportCard as tabel,
             fact/ tabel as kpd
     FROM 
-            ch_sv.KPD_Motivation_monitoring_of_staff_workload kpd
+            ch_sv."KPD_Motivation_monitoring_of_staff_workload" as kpd
     WHERE 
             UserGuid = '{0}'
         and 
             CurrentPeriod = toStartOfMonth(now())
-    ) kpd
+    ) as kpd
 """
 
 # Вернет массив
@@ -115,41 +122,40 @@ with kpd as
 
 # 2. Вернет массив: UserName, kpd, rating_kpd (Топ 5 пользователей по рейтингу в текущем месяце).
 top5_kpd_rating_users = """
-# with kpd as
-#         (
-#             SELECT
-#                     UserName,
-#                     UserGuid,
-#                     InvoiceTime + PaymentTime + ReturnTime + GivedTime + ArrivalTime + ShipmentTime +
-#                     BillingTime + WorkCarTime + ReevaluationTime + DustingTime + CleaningTime + ServisTime +
-#                     InventoryTime + GroupGoodsTime + (((InvoiceCnt * 2)*240)/3600) + OnlineOrdersTime + ActualTime +
-#                     ExchangeTime + ZReportTime as fact,
-#                     ReportCard as tabel,
-#                     fact / tabel as kpd
-#                     ,rank() over (order by kpd desc) as rating_kpd
-#             FROM
-#                     ch_sv.KPD_Motivation_monitoring_of_staff_workload kpd
-#             WHERE
-#                     RDCName = (
-#                                 SELECT
-#                                 DISTINCT
-#                                         RDCName as rrs
-#                                 FROM
-#                                         ch_sv.KPD_Motivation_monitoring_of_staff_workload
-#                                 WHERE
-#                                         UserGuid = '{0}'
-#                                 )
-#             and
-#                     CurrentPeriod = toStartOfMonth(now())
-#         )
-#         SELECT
-#                 UserName, kpd, rating_kpd from kpd limit 5
-#         union all
-#         SELECT
-#                 UserName, kpd, rating_kpd from kpd where  UserGuid = '{0}'
-#         UNION all
-#         SELECT UserName, kpd, rating_kpd from kpd order by rating_kpd desc limit 5
-
+with kpd as
+        (
+            SELECT
+                    UserName,
+                    UserGuid,
+                    InvoiceTime + PaymentTime + ReturnTime + GivedTime + ArrivalTime + ShipmentTime +
+                    BillingTime + WorkCarTime + ReevaluationTime + DustingTime + CleaningTime + ServisTime +
+                    InventoryTime + GroupGoodsTime + (((InvoiceCnt * 2)*240)/3600) + OnlineOrdersTime + ActualTime +
+                    ExchangeTime + ZReportTime as fact,
+                    ReportCard as tabel,
+                    fact / tabel as kpd
+                    ,rank() over (order by kpd desc) as rating_kpd
+            FROM
+                    ch_sv.KPD_Motivation_monitoring_of_staff_workload kpd
+            WHERE
+                    RDCName = (
+                                SELECT
+                                DISTINCT
+                                        RDCName as rrs
+                                FROM
+                                        ch_sv.KPD_Motivation_monitoring_of_staff_workload
+                                WHERE
+                                        UserGuid = '{0}'
+                                )
+            and
+                    CurrentPeriod = toStartOfMonth(now())
+        )
+        SELECT
+                UserName, kpd, rating_kpd from kpd limit 5
+        union all
+        SELECT
+                UserName, kpd, rating_kpd from kpd where  UserGuid = '{0}'
+        UNION all
+        SELECT UserName, kpd, rating_kpd from kpd order by rating_kpd desc limit 5
 """
 
 
